@@ -1,0 +1,303 @@
+services:
+  # ============================================
+  # PostgreSQL Databases
+  # ============================================
+  
+  certificate_postgres:
+    image: postgres:16
+    container_name: certificate_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=certificate_db
+    volumes:
+      - certificate_postgres_data:/var/lib/postgresql/data
+      - ./Database/Certificate Features/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - phishing_network
+
+  dns_postgres:
+    image: postgres:16
+    container_name: dns_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=dns_db
+    volumes:
+      - dns_postgres_data:/var/lib/postgresql/data
+      - ./Database/DNS Features/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - phishing_network
+
+  http_header_postgres:
+    image: postgres:16
+    container_name: http_header_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=http_header_db
+    volumes:
+      - http_header_postgres_data:/var/lib/postgresql/data
+      - ./Database/HTTP Header Features/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - phishing_network
+
+  http_redirection_postgres:
+    image: postgres:16
+    container_name: http_redirection_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=http_redirection_db
+    volumes:
+      - http_redirection_postgres_data:/var/lib/postgresql/data
+      - ./Database/HTTP Redirection Features/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - phishing_network
+
+  network_postgres:
+    image: postgres:16
+    container_name: network_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=network_db
+    volumes:
+      - network_postgres_data:/var/lib/postgresql/data
+      - ./Database/Network Features/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - phishing_network
+
+  server_status_postgres:
+    image: postgres:16
+    container_name: server_status_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=server_status_db
+    volumes:
+      - server_status_postgres_data:/var/lib/postgresql/data
+      - ./Database/Server Status Features/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - phishing_network
+
+  url_lexical_postgres:
+    image: postgres:16
+    container_name: url_lexical_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=url_lexical_db
+    volumes:
+      - url_lexical_postgres_data:/var/lib/postgresql/data
+      - ./Database/URL Lexical Features/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - phishing_network
+
+  whois_postgres:
+    image: postgres:16
+    container_name: whois_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=whois_db
+    volumes:
+      - whois_postgres_data:/var/lib/postgresql/data
+      - ./Database/WHOIS Features/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - phishing_network
+
+  # ============================================
+  # Crawlers Services (External MongoDB)
+  # ============================================
+
+  certificate:
+    build: ./Crawler/Certificate Features
+    container_name: certificate_container
+    ports:
+      - "8001:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=certificate_db
+      - COLLECTION_NAME=raw_certificate_data
+    networks:
+      - phishing_network
+
+  distributed:
+    build: ./Crawler/Distributed Features
+    container_name: distributed_container
+    ports:
+      - "8002:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=distributed_db
+      - COLLECTION_NAME=raw_distributed_data
+    networks:
+      - phishing_network
+
+  http_header:
+    build: ./Crawler/HTTP Header Features
+    container_name: http_header_container
+    ports:
+      - "8003:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=http_header_db
+      - COLLECTION_NAME=raw_http_header_data
+    networks:
+      - phishing_network
+
+  http_redirection:
+    build: ./Crawler/HTTP Redirection Features
+    container_name: http_redirection_container
+    ports:
+      - "8004:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=http_redirection_db
+      - COLLECTION_NAME=raw_redirection_data
+    networks:
+      - phishing_network
+
+  network:
+    build: ./Crawler/Network Features
+    container_name: network_container
+    ports:
+      - "8005:8000"
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=network_db
+      - COLLECTION_NAME=raw_network_data
+    networks:
+      - phishing_network
+
+  server_status:
+    build: ./Crawler/Server Status Features
+    container_name: server_status_container
+    ports:
+      - "8006:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=server_status_db
+      - COLLECTION_NAME=raw_server_status_data
+    networks:
+      - phishing_network
+
+  url_lexical:
+    build: ./Crawler/URL Lexical Features
+    container_name: url_lexical_container
+    ports:
+      - "8007:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=url_lexical_db
+      - COLLECTION_NAME=raw_url_lexical_data
+    networks:
+      - phishing_network
+
+  whois:
+    build: ./Crawler/WHOIS Features
+    container_name: whois_container
+    ports:
+      - "8008:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=whois_db
+      - COLLECTION_NAME=raw_whois_data
+    networks:
+      - phishing_network
+
+  # ============================================
+  # Pipeline Services
+  # ============================================
+
+  send_url:
+    build: ./send_url
+    container_name: send_url_container
+    ports:
+      - "8009:8000"
+    volumes:
+      - ./send_url:/app
+    networks:
+      - phishing_network
+
+  process:
+    build: ./process
+    container_name: process_container
+    ports:
+      - "8010:8000"
+    volumes:
+      - ./process:/app
+    networks:
+      - phishing_network
+
+  etl_pipeline:
+    build: ./etl_pipeline
+    container_name: etl_pipeline_container
+    volumes:
+      - ./etl_pipeline:/app
+    depends_on:
+      - certificate_postgres
+      - dns_postgres
+      - http_header_postgres
+      - http_redirection_postgres
+      - network_postgres
+      - server_status_postgres
+      - url_lexical_postgres
+      - whois_postgres
+    networks:
+      - phishing_network
+
+  drop_database:
+    build: ./drop_database
+    container_name: drop_database_container
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    networks:
+      - phishing_network
+
+  model_trainer:
+    build: ./model_trainer
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./model_trainer:/home/jovyan/work
+    environment:
+      - JUPYTER_TOKEN=matkhau123
+    depends_on:
+      - certificate_postgres
+      - dns_postgres
+      - http_header_postgres
+      - http_redirection_postgres
+      - network_postgres
+      - server_status_postgres
+      - url_lexical_postgres
+      - whois_postgres
+    networks:
+      - phishing_network
+
+  predict_api:
+    build: ./predict_api
+    container_name: predict_api_container
+    ports:
+      - "8011:8000"
+    volumes:
+      - ./predict_api:/app
+    networks:
+      - phishing_network
+
+networks:
+  phishing_network:
+    driver: bridge
+
+volumes:
+  certificate_postgres_data:
+  dns_postgres_data:
+  http_header_postgres_data:
+  http_redirection_postgres_data:
+  network_postgres_data:
+  server_status_postgres_data:
+  url_lexical_postgres_data:
+  whois_postgres_data:

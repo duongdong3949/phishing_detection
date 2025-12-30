@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Phishing Link Checker Pro",
+  "version": "2.1",
+  "permissions": ["declarativeNetRequest", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "declarative_net_request": {
+    "rule_resources": [{
+      "id": "ruleset_1",
+      "enabled": true,
+      "path": "ruleset.json"
+    }]
+  },
+  "background": { "service_worker": "background.js" }
+}
