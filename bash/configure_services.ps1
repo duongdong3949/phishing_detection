@@ -1,7 +1,18 @@
 $ErrorActionPreference = "Continue"
 
-$COSMOS_MONGO_URI = 'mongodb+srv://dong075:Password%40666@zevuqxrbyni.global.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000'
+# Load .env file from parent directory
+$EnvPath = Join-Path $PSScriptRoot "..\.env"
+if (Test-Path $EnvPath) {
+    Get-Content $EnvPath | ForEach-Object {
+        $line = $_.Trim()
+        if ($line -and -not $line.StartsWith("#")) {
+            $name, $value = $line -split "=", 2
+            [Environment]::SetEnvironmentVariable($name, $value, "Process")
+        }
+    }
+}
 
+$COSMOS_MONGO_URI = $env:MONGO_URI
 $RG = "Crawlers"
 $DOCKER_USER = "duongdong3949"
 $SUFFIX = "duong3949"

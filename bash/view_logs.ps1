@@ -43,7 +43,7 @@ function Show-VMLogs {
     }
     
     Write-Host "Connecting to $IP ($ADMIN_USER)..." -ForegroundColor Yellow
-    Write-Host "💡 Tip: Nhap password neu duoc hoi (Mac dinh: P@sswordSinhVien123!)" -ForegroundColor Gray
+    Write-Host "💡 Tip: Nhap password neu duoc hoi." -ForegroundColor Gray
     Write-Host "💡 Nhan Ctrl + C de thoat xem log." -ForegroundColor Gray
     Write-Host "-----------------------------------------------------"
     
